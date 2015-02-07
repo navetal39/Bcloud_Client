@@ -1,2 +1,2 @@
-# Bcloud_Main_Server
+# Bcloud_Client
 The Client program for Bcloud users.
