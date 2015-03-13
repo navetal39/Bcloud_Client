@@ -57,6 +57,8 @@ class Server(object):
         new_data = ''
         for key in updates_dict.keys():
             new_data += '{}:{}\n'.format(key, updates_dict[key])
+        if new_data == '': # In case the folder is now empty
+            new_data = 'EMPTY' # Sending an empty string can lead to some problems...
         message = 'NUD|'+folder_type
         secure_send(self.sock, message)
         response = secure_recv(self.sock)
@@ -77,6 +79,7 @@ class Server(object):
     def compare_updates(self, folder_type, first_time):
         updates_dict = self.memory.get_last_updates(folder_type)
         server_updates_dict = self.get_last_updates(folder_type)
+        
         compared = set()
         to_send, to_recv, to_delete = [], [], []
         for key in updates_dict.keys():
@@ -109,45 +112,50 @@ class Server(object):
             l_str.lstrip('<>')
         return l_str
         
-    def sync_with_server(self, folder_type, updates_dict, first_time = False):
-        to_send, to_recv, to_delete = self.compare_updates(self, folder_type, updates_dict, first_time)
+    def sync(self, folder_type, first_time = False):
+        to_send, to_recv, to_delete = self.compare_updates(self, folder_type, first_time)
         
-        to_send_str = self.stringify(to_send)
-        to_recv_str = self.stringify(to_recv)
-        to_delete_str = self.stringify(to_delete)
-        long_ass_message = "{}|{}|{}|".format(folder_type, to_recv_str, to_send_str)
-        if not first_time:
-            long_ass_message += to_delete_str
+        if len(to_send)+len(to_recv)+len(to_delete): # If there's something that needs to update
+            to_send_str = self.stringify(to_send)
+            to_recv_str = self.stringify(to_recv)
+            to_delete_str = self.stringify(to_delete)
+            long_ass_message = "{}|{}|{}|".format(folder_type, to_recv_str, to_send_str)
+            if not first_time:
+                long_ass_message += to_delete_str
 
-        secure_send(self.sock, 'SYN')
-        response = secure_recv(self.sock)
-        if response == 'ACK|SYN':
-            secure_file_send(self.sock, long_ass_message)
-        else:
-            raise # Shouldn't get here...
-
-        # Synchronization phases:
-        while True:
-            phase = secure_recv(self.sock, 3)
-            if phase == 'UPD': # Server is updating it's files
-                files_for_server = self.memory.get_files(folder_type, to_send)
-                secure_file_send(files_for_server)
-            elif phase == 'SND': # Server is ready to send files here
-                secure_send(self.sock, 'ACK|SND')
-                data = secure_file_recv(self.sock)
-                self.memory.update_files(folder_type, data)
-            elif phase == 'SNF': # Server didn't manage to give us our files
-                pass # SEE TO DO LIST
-            elif phase == 'DEL': # Server is ready to delete files on it's end
-                secure_send(self.sock, 'ACK|DEL')
-            elif phase == 'FIN': # Server finished it's part
-                break
+            
+            secure_send(self.sock, 'SYN')
+            response = secure_recv(self.sock)
+            if response == 'ACK|SYN':
+                secure_file_send(self.sock, long_ass_message)
             else:
-                raise # Shouldn't get here
+                raise # Shouldn't get here...
 
-        if first_time:
-            self.memory.delete_files(folder_type, to_delete)
-                                
+            # Synchronization phases:
+            while True:
+                phase = secure_recv(self.sock, 3)
+                if phase == 'UPD': # Server is updating it's files
+                    files_for_server = self.memory.get_files(folder_type, to_send)
+                    secure_file_send(files_for_server)
+                elif phase == 'SND': # Server is ready to send files here
+                    secure_send(self.sock, 'ACK|SND')
+                    data = secure_file_recv(self.sock)
+                    self.memory.update_files(folder_type, data)
+                elif phase == 'SNF': # Server didn't manage to give us our files
+                    pass # SEE TO DO LIST
+                elif phase == 'DEL': # Server is ready to delete files on it's end
+                    secure_send(self.sock, 'ACK|DEL')
+                elif phase == 'FIN': # Server finished it's part
+                    break
+                else:
+                    raise # Shouldn't get here
+
+            if first_time: # Deleting files on our end.
+                self.memory.delete_files(folder_type, to_delete)
+
+            self.update_updates_info(folder_type)
+
+                            
             
 
             
