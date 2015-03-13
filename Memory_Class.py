@@ -9,10 +9,26 @@ import os, sys, zipfile, zlib, win32api, win32con
 class Memory(object):
     def __init__(self, path):
         self.path = path
-        
+
+        try:
+            os.remove(self.path+'/files_to_server.zip')
+        except WindowsError, error:
+            if error.errno == 2:
+                pass
+            else:
+                raise
+        try:
+            os.remove(self.path+'/updated_files.zip')
+        except WindowsError, error:
+            if error.errno == 2:
+                pass
+            else:
+                raise
+            
         temp_archive = zipfile.ZipFile(self.path+'/files_to_server.zip', 'w', compression = zipfile.ZIP_DEFLATED)
         temp_archive.close()
-        temp_archive = zipfile.ZipFile('{}/updated_files.zip'.format(self.path), 'r')
+        temp_archive = zipfile.ZipFile(self.path+'/updated_files.zip', 'w', compression = zipfile.ZIP_DEFLATED)
+        temp_archive.close()
         
         win32api.SetFileAttributes(self.path+'/files_to_server.zip', win32con.FILE_ATTRIBUTE_HIDDEN)
         win32api.SetFileAttributes(self.path+'/updated_files.zip', win32con.FILE_ATTRIBUTE_HIDDEN)

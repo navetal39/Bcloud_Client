@@ -35,14 +35,18 @@ def check(data):
     
 
 def sync(server, username, password, initial = False):
-    server.connect(username, password)
-    print 'Connected'
-    server.sync('public', initial)
-    print 'Synchronized public folder'
-    server.sync('private', initial)
-    print 'Synchronized private folder'
-    server.disconnect()
-    print 'Disconnected'
+    status = server.connect(username, password)
+    if status == 'SCS':
+        print 'Connected'
+        server.sync('public', initial)
+        print 'Synchronized public folder'
+        server.sync('private', initial)
+        print 'Synchronized private folder'
+        server.disconnect()
+        print 'Disconnected'
+    else:
+        print "Didn't manage to connect... :/"
+        run() # Try again...
     
 def run():
     print 'Welcome to Bcloud!'
@@ -60,7 +64,7 @@ def run():
         else:
             print 'ERROR! {} is not a valid password!'.format(password)
 
-    memory = Memory(FOLDER_LOCATION)
+    memory = Memory(FOLDERS_LOCATION)
     server = Server(SYNC_IP, SYNC_PORT, memory)
     print 'Initial synchronization...'
     sync(server, username, password, True)

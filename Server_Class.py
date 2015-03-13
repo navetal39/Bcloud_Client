@@ -27,15 +27,18 @@ class Server(object):
         return "################\nThe main server is (or at least should be) listening on:\nIP address: {ip}\nTCP port: {port}\n################".format(ip=self.server_ip, port=self.server_port)
 
     def connect(self, username, password):
-        self.sock.connect((self.server_ip, self.server_port))
-        message = "AUT|{}|{}".format(username, password)
-        secure_send(self.sock, message)
-        response = secure_recv(self.sock)
-        response_parts = response.split('|')
-        flag = response_parts[0]; response_parts.remove(flag)
-        if response_parts == message.split('|'):
-            return flag
-        else:
+        try:
+            self.sock.connect((self.server_ip, self.server_port))
+            message = "AUT|{}|{}".format(username, password)
+            secure_send(self.sock, message)
+            response = secure_recv(self.sock)
+            response_parts = response.split('|')
+            flag = response_parts[0]; response_parts.remove(flag)
+            if response_parts == message.split('|'):
+                return flag
+            else:
+                raise
+        except:
             return 'WTF'
         
     def disconnect(self):
@@ -48,6 +51,7 @@ class Server(object):
         lines = file_content.split('\n')
         updates_dict = {}
         for line in lines:
+            print line
             pair = line.split(':')
             updates_dict[pair[0]] = pair[1]
         return updates_dict
@@ -113,7 +117,7 @@ class Server(object):
         return l_str
         
     def sync(self, folder_type, first_time = False):
-        to_send, to_recv, to_delete = self.compare_updates(self, folder_type, first_time)
+        to_send, to_recv, to_delete = self.compare_updates(folder_type, first_time)
         
         if len(to_send)+len(to_recv)+len(to_delete): # If there's something that needs to update
             to_send_str = self.stringify(to_send)
