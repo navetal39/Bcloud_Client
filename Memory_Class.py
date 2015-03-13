@@ -1,10 +1,8 @@
 # INFO: #
+# NOT TESTED YET
 # ===================================
 
-'''
-To Do:
-EVERYTHING
-'''
+
 
 import os, sys, zipfile, zlib, win32api, win32con
 

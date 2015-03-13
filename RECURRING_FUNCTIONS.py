@@ -1,6 +1,11 @@
 # INFO: #
 # ===================================
 
+'''
+TO DO:
+1) secured functions
+'''
+
 # File Transfering: #
 def file_recv(sock, count = 0):
     ''' This method is for reciving large files.
