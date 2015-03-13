@@ -6,11 +6,18 @@ To Do:
 EVERYTHING
 '''
 
-import os, sys, zipfile, zlib
+import os, sys, zipfile, zlib, win32api, win32con
 
 class Memory(object):
     def __init__(self, path):
         self.path = path
+        
+        temp_archive = zipfile.ZipFile(self.path+'/files_to_server.zip', 'w', compression = zipfile.ZIP_DEFLATED)
+        temp_archive.close()
+        temp_archive = zipfile.ZipFile('{}/updated_files.zip'.format(self.path), 'r')
+        
+        win32api.SetFileAttributes(self.path+'/files_to_server.zip', win32con.FILE_ATTRIBUTE_HIDDEN)
+        win32api.SetFileAttributes(self.path+'/updated_files.zip', win32con.FILE_ATTRIBUTE_HIDDEN)
 
     def get_last_updates(self, folder_type):
         updates_dict = {}
@@ -22,11 +29,11 @@ class Memory(object):
         return updates_dict
     
     def get_files(self, folder_type, files_list):
-       archive = zipfile.ZipFile(self.path+'/files_to_server', 'w', compression = zipfile.ZIP_DEFLATED)
+        archive = zipfile.ZipFile(self.path+'/files_to_server.zip', 'w', compression = zipfile.ZIP_DEFLATED)
         for file_path in files_list:
             archive.write('{path}/{folder}/{fil}'.format(path = self.path, folder = folder_type, fil = file_path), file_path)
         archive.close()
-        archive = open(self.path+'/files_to_server', 'rb')
+        archive = open(self.path+'/files_to_server.zip', 'rb')
         raw_data = archive.read()
         archive.close()
         return raw_data

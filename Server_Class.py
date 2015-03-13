@@ -12,13 +12,13 @@ from RECURRING_FUNCTIONS import *
 from Memory_Class import Memory
 
 class Server(object):
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, memory):
         ''' This method will run every time you boot up the module.
         '''
         self.server_ip = ip
         self.server_port = port
         self.sock = socket.socket()
-        self.memory = Memory()
+        self.memory = memory
     
     def __str__(self):
         return "ip: {ip}; port: {port}".format(ip=self.server_ip, port=self.server_port)

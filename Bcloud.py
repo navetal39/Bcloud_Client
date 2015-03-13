@@ -5,9 +5,10 @@
 To Do:
 1) Installation GUI?
 2) GUI?
+3) Think of a better name for the server class
 '''
 
-import os, sys, socket, time
+import os, sys, socket, time, win32api, win32con
 from COM import *
 from RECURRING_FUNCTIONS import *
 from Server_Class import Server
@@ -59,8 +60,8 @@ def run():
         else:
             print 'ERROR! {} is not a valid password!'.format(password)
 
-    
-    server = Server(SYNC_IP, SYNC_PORT)
+    memory = Memory(FOLDER_LOCATION)
+    server = Server(SYNC_IP, SYNC_PORT, memory)
     print 'Initial synchronization...'
     sync(server, username, password, True)
     while True:
