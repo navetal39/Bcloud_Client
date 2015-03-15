@@ -49,14 +49,15 @@ class Server(object):
         message = "LUD|"+folder_type
         secure_send(self.sock, message)
         file_content = file_recv(self.sock)
-        if file_content == 'Empty':
+        print file_content
+        if file_content == 'EMPTY':
             file_content = '' # Empty strings can lead to some problems...
         lines = file_content.split('\n')
         updates_dict = {}
         for line in lines:
             if len(line):
                 pair = line.split(':')
-                updates_dict[pair[0]] = pair[1]
+                updates_dict[pair[0]] = float(pair[1])
         return updates_dict
 
     def update_updates_info(self, folder_type):
@@ -72,7 +73,7 @@ class Server(object):
         response_parts = response.split('|')
         flag = response_parts[0]; response_parts.remove(flag)
         if flag == 'ACK' and response_parts == message.split('|'):
-            secure_file_send(new_data)
+            secure_file_send(self.sock, new_data)
             final_response = secure_recv(self.sock)
             final_response_parts = final_response.split('|')
             final_flag = final_response_parts[0]; final_response_parts.remove(final_flag)
@@ -91,7 +92,7 @@ class Server(object):
         to_send, to_recv, to_delete = [], [], []
         for key in updates_dict.keys():
             if key in server_updates_dict.keys(): # Both client and server have the file
-                dif = updates_dict[key]-server_updates_dict[key]
+                dif = updates_dict[key] - server_updates_dict[key]
                 if dif > 0: # Our version is the most up-to-date
                     to_send.append(key)
                 elif dif <0: # The server's version is the most up-to-date
@@ -124,12 +125,12 @@ class Server(object):
     def sync(self, folder_type, first_time = False):
         to_send, to_recv, to_delete = self.compare_updates(folder_type, first_time)
         total_changes = len(to_send)+len(to_recv)+len(to_delete)
-        other_total_changes = len(to_send)+len(to_recv)
-        if ((total_changes and not first_time) or (other_total_changes and first_time)): # If there's something that needs to update on the server's stide
+        first_total_changes = len(to_send)+len(to_recv)
+        if ((total_changes and not first_time) or (first_total_changes and first_time)): # If there's something that needs to update on the server's stide
             to_send_str = self.stringify(to_send)
             to_recv_str = self.stringify(to_recv)
             to_delete_str = self.stringify(to_delete)
-            long_ass_message = "{}|{}|{}|".format(folder_type, to_recv_str, to_send_str)
+            long_ass_message = "{}|{}|".format(folder_type, to_recv_str)
             if not first_time:
                 long_ass_message += to_delete_str
 
@@ -148,7 +149,7 @@ class Server(object):
                 phase = secure_recv(self.sock, 3)
                 if phase == 'UPD': # Server is updating it's files
                     files_for_server = self.memory.get_files(folder_type, to_send)
-                    secure_file_send(files_for_server)
+                    secure_file_send(self.sock, files_for_server)
                 elif phase == 'SND': # Server is ready to send files here
                     secure_send(self.sock, 'ACK|SND')
                     data = secure_file_recv(self.sock)

@@ -39,7 +39,7 @@ class Memory(object):
             for file_name in files:
                 file_path = os.path.join(root, file_name)
                 last_update = os.stat(file_path).st_mtime
-                updates_dict[file_path] = last_update
+                updates_dict[os.path.join(root.lstrip('{}/{}'.format(self.path, folder_type)), file_name)] = last_update
         return updates_dict
     
     def get_files(self, folder_type, files_list):
@@ -61,7 +61,7 @@ class Memory(object):
         updated_files.close()
 
     def delete_files(self, folder_type, files_list):
-        for path in files:
+        for file_name in files_list:
             try:
                 os.remove('{}/{}/{}'.format(self.path, folder_type, file_name))
             except WindowsError, error:
