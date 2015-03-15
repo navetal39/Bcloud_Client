@@ -28,6 +28,7 @@ class Server(object):
 
     def connect(self, username, password):
         try:
+            self.sock = socket.socket()
             self.sock.connect((self.server_ip, self.server_port))
             message = "AUT|{}|{}".format(username, password)
             secure_send(self.sock, message)
@@ -117,13 +118,14 @@ class Server(object):
         for item in l:
             l_str+='<>{}'.format(item)
         if len(l_str):
-            l_str.lstrip('<>')
+            l_str = l_str.lstrip('<>')
         return l_str
         
     def sync(self, folder_type, first_time = False):
         to_send, to_recv, to_delete = self.compare_updates(folder_type, first_time)
-        
-        if len(to_send)+len(to_recv)+len(to_delete): # If there's something that needs to update
+        total_changes = len(to_send)+len(to_recv)+len(to_delete)
+        other_total_changes = len(to_send)+len(to_recv)
+        if ((total_changes and not first_time) or (other_total_changes and first_time)): # If there's something that needs to update on the server's stide
             to_send_str = self.stringify(to_send)
             to_recv_str = self.stringify(to_recv)
             to_delete_str = self.stringify(to_delete)
@@ -131,9 +133,11 @@ class Server(object):
             if not first_time:
                 long_ass_message += to_delete_str
 
-            
+            print long_ass_message
+            print to_delete_str
             secure_send(self.sock, 'SYN')
             response = secure_recv(self.sock)
+            print "Recived " + response
             if response == 'ACK|SYN':
                 secure_file_send(self.sock, long_ass_message)
             else:
@@ -158,10 +162,10 @@ class Server(object):
                 else:
                     raise # Shouldn't get here
 
-            if first_time: # Deleting files on our end.
-                self.memory.delete_files(folder_type, to_delete)
+        if first_time: # Deleting files on our end.
+            self.memory.delete_files(folder_type, to_delete)
 
-            self.update_updates_info(folder_type)
+        self.update_updates_info(folder_type)
 
                             
             
