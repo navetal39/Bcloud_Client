@@ -42,18 +42,20 @@ class Server(object):
             return 'WTF'
         
     def disconnect(self):
-        self.MAIN_SOCKET.close()
+        self.sock.close()
 
     def get_last_updates(self, folder_type):
         message = "LUD|"+folder_type
         secure_send(self.sock, message)
         file_content = file_recv(self.sock)
+        if file_content == 'Empty':
+            file_content = '' # Empty strings can lead to some problems...
         lines = file_content.split('\n')
         updates_dict = {}
         for line in lines:
-            print line
-            pair = line.split(':')
-            updates_dict[pair[0]] = pair[1]
+            if len(line):
+                pair = line.split(':')
+                updates_dict[pair[0]] = pair[1]
         return updates_dict
 
     def update_updates_info(self, folder_type):
@@ -107,6 +109,8 @@ class Server(object):
                 continue
             else: # We don't have this file
                 to_recv.append(key)
+
+        return to_send, to_recv, to_delete
 
     def stringify(self, l):
         l_str = ''

@@ -15,7 +15,7 @@ from Server_Class import Server
 from Memory_Class import Memory
 
 # Constants: #
-FOLDERS_LOCATION = 'C:/Users/user/Bcloud'
+global FOLDERS_LOCATION
 TIME_BETWEEN_SYNCS = 900 # 900 sec = 1/4 h
 BAD_CHARS = ("\\", '/', ':', '*', '?', '"', '<', '>', '|')
 MIN_LENGTH = 4
@@ -47,9 +47,31 @@ def sync(server, username, password, initial = False):
     else:
         print "Didn't manage to connect... :/"
         run() # Try again...
+
+def prepare_folders(path):
+    if os.path.exists(path):
+        if not os.path.exists(path+'/Bcloud'):
+            os.makedirs(path+'/Bcloud')
+        if not os.path.exists(path+'/Bcloud/private'):
+            os.makedirs(path+'/Bcloud/private')
+        if not os.path.exists(path+'/Bcloud/public'):
+            os.makedirs(path+'/Bcloud/public')
+    else:
+        raise
     
 def run():
     print 'Welcome to Bcloud!'
+
+    while True: #Folders set-up
+        try:
+            FOLDERS_LOCATION = raw_input('Enter the location of the Bcloud folder: ')
+            prepare_folders(FOLDERS_LOCATION)
+        except:
+            pass
+        else:
+            FOLDERS_LOCATION += '/Bcloud'
+            break
+
     
     while True:
         username = raw_input('Username: ')
