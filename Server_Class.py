@@ -39,7 +39,8 @@ class Server(object):
                 return flag
             else:
                 raise
-        except:
+        except Exception, error:
+            print 'ERROR', error
             return 'WTF'
         
     def disconnect(self):
@@ -124,49 +125,74 @@ class Server(object):
         
     def sync(self, folder_type, first_time = False):
         to_send, to_recv, to_delete = self.compare_updates(folder_type, first_time)
+        print 'compared'
         total_changes = len(to_send)+len(to_recv)+len(to_delete)
+        print total_changes, 'changes'
         first_total_changes = len(to_send)+len(to_recv)
         if ((total_changes and not first_time) or (first_total_changes and first_time)): # If there's something that needs to update on the server's stide
+            print 'doing stuff'
             to_send_str = self.stringify(to_send)
             to_recv_str = self.stringify(to_recv)
             to_delete_str = self.stringify(to_delete)
+            print 'stringified'
             long_ass_message = "{}|{}|".format(folder_type, to_recv_str)
+            print 'long ass'
+            if len(to_send):
+                long_ass_message += 'UPDATE'
+                print 'longer ass'
+            long_ass_message += '|'
             if not first_time:
                 long_ass_message += to_delete_str
+                print 'longest ass'
 
-            print long_ass_message
-            print to_delete_str
+            print 'changes:', long_ass_message
+            if first_time:
+                print 'delete:', to_delete_str
             secure_send(self.sock, 'SYN')
+            print 'sync begun'
             response = secure_recv(self.sock)
             print "Recived " + response
             if response == 'ACK|SYN':
                 secure_file_send(self.sock, long_ass_message)
+                print 'long ass sent'
             else:
+                print 'server is drunk. raising...'
                 raise # Shouldn't get here...
 
             # Synchronization phases:
             while True:
                 phase = secure_recv(self.sock, 3)
+                print 'phase', phase
                 if phase == 'UPD': # Server is updating it's files
                     files_for_server = self.memory.get_files(folder_type, to_send)
+                    print 'got files for server'
                     secure_file_send(self.sock, files_for_server)
+                    print 'sent files'
                 elif phase == 'SND': # Server is ready to send files here
                     secure_send(self.sock, 'ACK|SND')
+                    print 'send ack'
                     data = secure_file_recv(self.sock)
+                    print 'got data'
                     self.memory.update_files(folder_type, data)
+                    print 'updated files'
                 elif phase == 'SNF': # Server didn't manage to give us our files
+                    print 'SEND FAILED'
                     pass # SEE TO DO LIST
                 elif phase == 'DEL': # Server is ready to delete files on it's end
                     secure_send(self.sock, 'ACK|DEL')
+                    print 'sent permission to delete files'
                 elif phase == 'FIN': # Server finished it's part
+                    print 'HALELUJA!'
                     break
                 else:
                     raise # Shouldn't get here
 
         if first_time: # Deleting files on our end.
             self.memory.delete_files(folder_type, to_delete)
+            print 'files deleted'
 
         self.update_updates_info(folder_type)
+        print 'updated him'
 
                             
             

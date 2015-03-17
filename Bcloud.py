@@ -91,7 +91,11 @@ def run():
     print 'Initial synchronization...'
     sync(server, username, password, True)
     while True:
-        time.sleep(TIME_BETWEEN_SYNCS)
+        # time.sleep(TIME_BETWEEN_SYNCS)
+        #for i in xrange(20):
+        #    print 20 - i
+        #    time.sleep(1)
+        raw_input()
         sync(server, username, password)
     
 
