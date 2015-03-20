@@ -94,7 +94,8 @@ def secure_file_recv(sock, count = 0):
         if flag != 'SIZ':
             raise
         size = int(str_size)
-    except:
+    except Exception, e:
+        print e
         if count < 3: #Just making sure that it won't attemt endlessly
             print 'try again' # for the record...
             seure_send(sock, 'NAK|'+response)

@@ -88,12 +88,12 @@ class Server(object):
     def compare_updates(self, folder_type, first_time):
         updates_dict = self.memory.get_last_updates(folder_type)
         server_updates_dict = self.get_last_updates(folder_type)
-        
+        print updates_dict, 'and', server_updates_dict
         compared = set()
         to_send, to_recv, to_delete = [], [], []
         for key in updates_dict.keys():
             if key in server_updates_dict.keys(): # Both client and server have the file
-                dif = updates_dict[key] - server_updates_dict[key]
+                dif = int(updates_dict[key]) - int(server_updates_dict[key]) # Rounds the numbers because OS is being annoying to me.
                 if dif > 0: # Our version is the most up-to-date
                     to_send.append(key)
                 elif dif <0: # The server's version is the most up-to-date

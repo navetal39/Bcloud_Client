@@ -87,6 +87,7 @@ def run():
             print 'ERROR! {} is not a valid password!'.format(password)
 
     memory = Memory(FOLDERS_LOCATION)
+    print 'memory set up'
     server = Server(SYNC_IP, SYNC_PORT, memory)
     print 'Initial synchronization...'
     sync(server, username, password, True)
