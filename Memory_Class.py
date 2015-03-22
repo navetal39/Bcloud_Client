@@ -93,6 +93,14 @@ class Memory(object):
             try:
                 os.remove('{}/{}/{}'.format(self.path, folder_type, file_name))
                 print 'removed {}/{}/{}'.format(self.path, folder_type, file_name)
+                folders = file_name.split('/'); actual_file = folders[-1]; folders.remove(actual_file)
+                while len(folders > 0):
+                    path = os.path.join(self.path, folder_type, folders)
+                    if os.listdir(path) == []: # There are no files in the top foler
+                        os.remove(path)
+                        top_folder = folders[-1]; folders.remove(top_folder)
+                    else: # There are files, the foler is needed
+                        break
             except WindowsError, error:
                 if error.errno == 2:
                     continue
