@@ -16,7 +16,7 @@ class Memory(object):
             for file_name in files:
                 file_path = os.path.join(root, file_name)
                 print 'glu: looking at file: '+file_path
-                last_update = os.stat(file_path).st_mtime
+                last_update = int(os.stat(file_path).st_mtime)
                 print 'glu: last update: '+str(last_update)
                 updates_dict[os.path.join(root.lstrip('{}/{}'.format(self.path, folder_type)), file_name)] = last_update
                 print 'glu: updated dict'

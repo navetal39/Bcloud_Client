@@ -29,12 +29,19 @@ class Server(object):
     def connect(self, username, password):
         try:
             self.sock = socket.socket()
+            print 'cnt: defined'
             self.sock.connect((self.server_ip, self.server_port))
+            print 'cnt: connected'
             message = "AUT|{}|{}".format(username, password)
+            print 'cnt: made AUT'
             secure_send(self.sock, message)
+            print 'cnt: sent AUT'
             response = secure_recv(self.sock)
+            print 'cnt: got response'
             response_parts = response.split('|')
+            print 'cnt: split'
             flag = response_parts[0]; response_parts.remove(flag)
+            print 'cnt: got flag'
             if response_parts == message.split('|'):
                 return flag
             else:
@@ -45,39 +52,56 @@ class Server(object):
         
     def disconnect(self):
         self.sock.close()
+        print 'dsc: closed'
 
     def get_last_updates(self, folder_type):
         message = "LUD|"+folder_type
+        print 'glu: made message'
         secure_send(self.sock, message)
+        print 'glu: sent'
         file_content = file_recv(self.sock)
+        print 'glu: recived:'
         print file_content
         if file_content == 'EMPTY':
             file_content = '' # Empty strings can lead to some problems...
         lines = file_content.split('\n')
+        print 'glu: split'
         updates_dict = {}
         for line in lines:
             if len(line):
                 pair = line.split(':')
-                updates_dict[pair[0]] = float(pair[1])
+                updates_dict[pair[0]] = int(pair[1])
+                print 'glu: added to updates dict'
         return updates_dict
 
     def update_updates_info(self, folder_type):
         updates_dict = self.memory.get_last_updates(folder_type)
+        print 'uui: got dict'
         new_data = ''
         for key in updates_dict.keys():
             new_data += '{}:{}\n'.format(key, updates_dict[key])
         if new_data == '': # In case the folder is now empty
             new_data = 'EMPTY' # Sending an empty string can lead to some problems...
+        print 'uui: made new data'
         message = 'NUD|'+folder_type
+        print 'uui: made message'
         secure_send(self.sock, message)
+        print 'uui: sent'
         response = secure_recv(self.sock)
+        print 'uui: recived'
         response_parts = response.split('|')
+        print 'uui: split'
         flag = response_parts[0]; response_parts.remove(flag)
+        print 'uui: got flag'
         if flag == 'ACK' and response_parts == message.split('|'):
             secure_file_send(self.sock, new_data)
+            print 'uui: sent file'
             final_response = secure_recv(self.sock)
+            print 'uui: final recive'
             final_response_parts = final_response.split('|')
+            print 'uui: split again'
             final_flag = final_response_parts[0]; final_response_parts.remove(final_flag)
+            print 'uui: more flag'
             if final_response_parts == message.split('|'):
                 return final_flag
             else:
@@ -87,23 +111,32 @@ class Server(object):
 
     def compare_updates(self, folder_type, first_time):
         updates_dict = self.memory.get_last_updates(folder_type)
+        print 'cmp: got dict'
         server_updates_dict = self.get_last_updates(folder_type)
+        print 'cmp: more dict'
         print updates_dict, 'and', server_updates_dict
         compared = set()
         to_send, to_recv, to_delete = [], [], []
         for key in updates_dict.keys():
             if key in server_updates_dict.keys(): # Both client and server have the file
-                dif = int(updates_dict[key]) - int(server_updates_dict[key]) # Rounds the numbers because OS is being annoying to me.
+                print 'matching'
+                dif = updates_dict[key] - server_updates_dict[key]
+                print 'dif:', dif
                 if dif > 0: # Our version is the most up-to-date
+                    print 'cmp: send'
                     to_send.append(key)
-                elif dif <0: # The server's version is the most up-to-date
+                elif dif < 0: # The server's version is the most up-to-date
+                    print 'cmp: recv'
                     to_recv.append(key)
                 else: # Both versions are up-to-date
-                    continue
+                    pass
             else: # The server doesn't have the file
+                print 'not matching'
                 if first_time: # The file was removed on a previous run on another machine
+                    print 'cmp: delete'
                     to_delete.append(key)
                 else: # A new file that was created during this run
+                    print 'cmp: send'
                     to_send.append(key)
             compared.add(key)
             
@@ -111,7 +144,12 @@ class Server(object):
             if key in compared: # Already did this one
                 continue
             else: # We don't have this file
-                to_recv.append(key)
+                if first_time:
+                    print 'cmp: recv'
+                    to_recv.append(key)
+                else:
+                    print 'cmp: del'
+                    to_delete.append(key)
 
         return to_send, to_recv, to_delete
 
