@@ -6,6 +6,7 @@ To Do:
 1) Installation GUI?
 2) GUI?
 3) Think of a better name for the server class
+4) Figure out why some file types won't be sent (i.e. pictures)
 '''
 
 import os, sys, socket, time, win32api, win32con
