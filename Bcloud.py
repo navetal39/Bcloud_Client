@@ -16,7 +16,6 @@ from Server_Class import Server
 from Memory_Class import Memory
 
 # Constants: #
-global FOLDERS_LOCATION
 TIME_BETWEEN_SYNCS = 900 # 900 sec = 1/4 h
 BAD_CHARS = ("\\", '/', ':', '*', '?', '"', '<', '>', '|')
 MIN_LENGTH = 4
@@ -63,6 +62,7 @@ def prepare_folders(path):
 def run():
     print 'Welcome to Bcloud!'
 
+    global FOLDERS_LOCATION
     prepare_folders(FOLDERS_LOCATION)
     FOLDERS_LOCATION += '/Bcloud'
 

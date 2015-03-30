@@ -7,7 +7,7 @@ To Do:
 '''
 
 import socket
-from COM import *
+from Config import *
 from RECURRING_FUNCTIONS import *
 from Memory_Class import Memory
 
