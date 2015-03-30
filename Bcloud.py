@@ -10,7 +10,7 @@ To Do:
 '''
 
 import os, sys, socket, time, win32api, win32con
-from COM import *
+from Config import *
 from RECURRING_FUNCTIONS import *
 from Server_Class import Server
 from Memory_Class import Memory
@@ -63,15 +63,8 @@ def prepare_folders(path):
 def run():
     print 'Welcome to Bcloud!'
 
-    while True: #Folders set-up
-        try:
-            FOLDERS_LOCATION = raw_input('Enter the location of the Bcloud folder: ')
-            prepare_folders(FOLDERS_LOCATION)
-        except:
-            pass
-        else:
-            FOLDERS_LOCATION += '/Bcloud'
-            break
+    prepare_folders(FOLDERS_LOCATION)
+    FOLDERS_LOCATION += '/Bcloud'
 
     
     while True:
