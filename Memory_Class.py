@@ -35,11 +35,11 @@ class Memory(object):
         archive = zipfile.ZipFile(self.path+'/files_to_server.zip', 'w', compression = zipfile.ZIP_DEFLATED) # Creation
         print 'gfl: created zip'
         for file_path in files_list:
+            print 'gfl: Adding {} to zip'.format(file_path)
             archive.write('{path}/{folder}/{fil}'.format(path = self.path, folder = folder_type, fil = file_path), file_path) # Writing
-            print 'gfl: Added {} to zip'.format(file_path)
-            
+        print 'gfl: finished writing'
         archive.close()
-        print 'gfl: finished writing to zip'
+        print 'gfl: closed zip'
         archive = open(self.path+'/files_to_server.zip', 'rb') # Reading raw data
         print 'gfl: reading from zip'
         raw_data = archive.read()
