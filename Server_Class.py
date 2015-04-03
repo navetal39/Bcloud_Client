@@ -77,7 +77,7 @@ class Server(object):
     def update_updates_info(self, folder_type):
         updates_dict = self.memory.get_last_updates(folder_type)
         print 'uui: got dict'
-        new_data = ''
+        new_data = ""
         for key in updates_dict.keys():
             new_data += '{}:{}\n'.format(key, updates_dict[key])
         if new_data == '': # In case the folder is now empty
