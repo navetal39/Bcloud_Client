@@ -92,7 +92,9 @@ def run():
         raw_input()
         sync(server, username, password)
     
+run()
 
+raw_input('')
 '''
 Exciting. Satisfying. Period.
 .
