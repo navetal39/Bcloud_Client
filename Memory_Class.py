@@ -76,7 +76,7 @@ class Memory(object):
         print 'upd: wrote to zip'
         updated_files = zipfile.ZipFile('{}/updated_files.zip'.format(self.path), 'r') # Extracting
         print 'upd: opened zip'
-        updated_files.extract_all('{}/{}'.format(self.path, folder_type))
+        updated_files.extractall('{}/{}'.format(self.path, folder_type))
         print 'upd: extracted'
         updated_files.close()
         try:

@@ -16,7 +16,6 @@ from Server_Class import Server
 from Memory_Class import Memory
 
 # Constants: #
-TIME_BETWEEN_SYNCS = 900 # 900 sec = 1/4 h
 BAD_CHARS = ("\\", '/', ':', '*', '?', '"', '<', '>', '|')
 MIN_LENGTH = 4
 MAX_LENGTH = 32
@@ -63,6 +62,7 @@ def run():
     print 'Welcome to Bcloud!'
 
     global FOLDERS_LOCATION
+    global TIME_BETWEEN_SYNCS
     prepare_folders(FOLDERS_LOCATION)
     FOLDERS_LOCATION += '/Bcloud'
 
@@ -86,16 +86,10 @@ def run():
     print 'Initial synchronization...'
     sync(server, username, password, True)
     while True:
-        # time.sleep(TIME_BETWEEN_SYNCS)
-        #for i in xrange(20):
-        #    print 20 - i
-        #    time.sleep(1)
-        raw_input()
+        time.sleep(TIME_BETWEEN_SYNCS)
+        # raw_input()
         sync(server, username, password)
-    
-run()
 
-raw_input('')
 '''
 Exciting. Satisfying. Period.
 .

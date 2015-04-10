@@ -1,3 +1,6 @@
+# INFO: #
+# ===================================
+
 from Crypto.Cipher import AES
 
 KEY = "veryExaTisFayiNg"
