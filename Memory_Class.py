@@ -9,8 +9,14 @@ import os, sys, zipfile, zlib, win32api, win32con
 class Memory(object):
     def __init__(self, path):
         self.path = path
-        
+
+    def ensure_existance(self, folder_type):
+        if not os.path.exists(self.path + '/' + folder_type):
+            os.makedirs(self.path + '/' + folder_type)
+    
     def get_last_updates(self, folder_type):
+        ensure_existance(folder_type)
+        
         updates_dict = {}
         for root, dirs, files in os.walk('{}/{}'.format(self.path, folder_type)):
             for file_name in files:
@@ -23,6 +29,8 @@ class Memory(object):
         return updates_dict
     
     def get_files(self, folder_type, files_list):
+        ensure_existance(folder_type)
+        
         try:
             os.remove(self.path+'/files_to_server.zip') # Removal - Just in case
         except WindowsError, error:
@@ -57,7 +65,9 @@ class Memory(object):
         print 'gfl: returning '+raw_data
         return raw_data
 
-    def update_files(self, folder_type, raw_data): 
+    def update_files(self, folder_type, raw_data):
+        ensure_existance(folder_type)
+        
         try:
             os.remove(self.path+'/updated_files.zip') # Removal - Just in case
         except WindowsError, error:
@@ -89,6 +99,8 @@ class Memory(object):
                 raise
 
     def delete_files(self, folder_type, files_list):
+        ensure_existance(folder_type)
+        
         for file_name in files_list:
             try:
                 os.remove('{}/{}/{}'.format(self.path, folder_type, file_name))

@@ -34,6 +34,8 @@ def check(data):
     
 
 def sync(server, username, password, initial = False):
+    ''' All sync phases in one method
+    '''
     status = server.connect(username, password)
     if status == 'SCS':
         print 'Connected'
@@ -48,6 +50,8 @@ def sync(server, username, password, initial = False):
         run() # Try again...
 
 def prepare_folders(path):
+    ''' Makes sure all the necesary folders exists
+    '''
     if os.path.exists(path):
         if not os.path.exists(path+'/Bcloud'):
             os.makedirs(path+'/Bcloud')
