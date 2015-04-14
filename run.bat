@@ -1,2 +1,2 @@
 @ECHO OFF
-python pyrun.py
+python pyrunner.py
