@@ -14,6 +14,7 @@ from Config import *
 from RECURRING_FUNCTIONS import *
 from Server_Class import Server
 from Memory_Class import Memory
+from crypto import do_hash
 
 # Constants: #
 BAD_CHARS = ("\\", '/', ':', '*', '?', '"', '<', '>', '|')
@@ -46,7 +47,7 @@ def sync(server, username, password, initial = False):
         server.disconnect()
         print 'Disconnected'
     else:
-        print "Didn't manage to connect... :/"
+        print "Didn't manage to connect (maybe wrong password or username)... :/"
         run() # Try again...
 
 def prepare_folders(path):
@@ -80,6 +81,7 @@ def run():
     while True:
         password = raw_input('Password: ')
         if check(password):
+            password = do_hash(password)
             break
         else:
             print 'ERROR! {} is not a valid password!'.format(password)

@@ -2,6 +2,14 @@
 # ===================================
 
 from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
+
+
+def do_hash(mess):
+    hasher = SHA256.new()
+    hasher.update(mess)
+    return hasher.digest()
+
 
 KEY = "veryExaTisFayiNg"
 BLOCK_SIZE = 32
