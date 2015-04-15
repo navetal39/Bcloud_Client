@@ -59,7 +59,7 @@ class Server(object):
         print 'glu: made message'
         secure_send(self.sock, message)
         print 'glu: sent'
-        file_content = file_recv(self.sock)
+        file_content = secure_file_recv(self.sock)
         print 'glu: recived:'
         print file_content
         if file_content == 'EMPTY':
