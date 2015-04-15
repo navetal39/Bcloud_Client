@@ -12,7 +12,7 @@ import crypto
 def file_recv(sock, count = 0):
     ''' This method is for reciving large files.
     '''
-    response = sock.recv(5000)
+    response = sock.recv(2048)
     print 'recived '+response # -For The Record-
     flag, str_size = response.split('|')
     try:
@@ -41,7 +41,7 @@ def file_send(sock, mess):
     size_message = 'SIZ|{}'.format(size)
     print 'sending '+size_message # -For The Record-
     sock.send('SIZ|{}'.format(size))
-    response = sock.recv(5000)
+    response = sock.recv(2048)
     print 'recived '+response # -For The Record-
     response_parts = response.split('|')
     flag = response_parts[0]; response_parts.remove(flag)
@@ -63,7 +63,7 @@ def file_send(sock, mess):
 
 
 # Secure communication #:
-def secure_recv(sock, size = 5000):
+def secure_recv(sock, size = 2048):
     ''' This method receives the encrypted message (the ciphertext), decrypts it and returns the plaintext (NOT SSL/TLS).
     '''
     encMess = sock.recv(size)
@@ -107,11 +107,11 @@ def secure_file_recv(sock, count = 0):
 def secure_file_send(sock, mess):
     ''' This method is for sending large files.
     '''
-    size = len(mess)
-    size_message = 'SIZ|{}'.format(size)
+    size = len(crypto.encrypt(mess))    
+    size_message = 'SIZ|{}'.format(size)    
     print 'sending '+size_message # -For The Record-
-    secure_send(sock, size_message)
-    response = sock.recv(5000)
+    secure_send(sock, size_message)    
+    response = secure_recv(sock, size = len(size_message) + 5) #Isn't that supposed to be secure_recv()?
     print 'recived '+response # -For The Record-
     response_parts = response.split('|')
     flag = response_parts[0]; response_parts.remove(flag)
