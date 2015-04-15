@@ -69,7 +69,7 @@ def run():
     global FOLDERS_LOCATION
     global TIME_BETWEEN_SYNCS
     prepare_folders(FOLDERS_LOCATION)
-    FOLDERS_LOCATION += '/Bcloud'
+    ACTUAL_FOLDERS_LOCATION = FOLDERS_LOCATION + '/Bcloud'
 
     
     while True:
@@ -86,7 +86,7 @@ def run():
         else:
             print 'ERROR! {} is not a valid password!'.format(password)
 
-    memory = Memory(FOLDERS_LOCATION)
+    memory = Memory(ACTUAL_FOLDERS_LOCATION)
     print 'memory set up'
     server = Server(SYNC_IP, SYNC_PORT, memory)
     print 'Initial synchronization...'
