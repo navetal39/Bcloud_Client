@@ -199,7 +199,7 @@ class Server(object):
 
             # Synchronization phases:
             while True:
-                phase = secure_recv(self.sock, 3)
+                phase = secure_recv(self.sock)
                 print 'phase', phase
                 if phase == 'UPD': # Server is updating it's files
                     files_for_server = self.memory.get_files(folder_type, to_send)
