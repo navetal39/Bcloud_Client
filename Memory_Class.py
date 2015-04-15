@@ -62,7 +62,7 @@ class Memory(object):
             else:
                 print 'ERROR', error
                 raise
-        print 'gfl: returning '+raw_data
+        print 'gfl: returning raw data'
         return raw_data
 
     def update_files(self, folder_type, raw_data):
