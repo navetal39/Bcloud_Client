@@ -84,7 +84,11 @@ def secure_file_recv(sock, count = 0):
     '''
     response = secure_recv(sock)
     print 'recived '+response # -For The Record-
-    flag, str_size = response.split('|')
+    try:
+        flag, str_size = response.split('|')
+    except ValueError:
+        print "------------>Server probably crashed<------------"
+        flag = 'WTF'
     try:
         if flag != 'SIZ':
             raise
