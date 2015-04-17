@@ -11,6 +11,8 @@ from Config import *
 from RECURRING_FUNCTIONS import *
 from Memory_Class import Memory
 
+IGNORE = ('.db', '.ini')
+
 class Server(object):
     def __init__(self, ip, port, memory):
         ''' This method will run every time you boot up the module.
@@ -114,6 +116,13 @@ class Server(object):
         print 'cmp: got dict'
         server_updates_dict = self.get_last_updates(folder_type)
         print 'cmp: more dict'
+        for extention in IGNORE:
+            for key in updates_dict.keys():
+                if updates_dict[key].endswith(extention):
+                    del updates_dict[key]
+            for key in server_updates_dict.keys():
+                if server_updates_dict[key].endswith(extention):
+                    del server_updates_dict[key]
         print updates_dict, 'and', server_updates_dict
         compared = set()
         to_send, to_recv, to_delete = [], [], []
