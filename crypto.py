@@ -1,8 +1,18 @@
+# Imports: #
 from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
 
+# Hash func: #
+def do_hash(mess):
+    hasher = SHA256.new()
+    hasher.update(mess)
+    return hasher.hexdigest()
+
+# Constants for ecryption: #
 BLOCK_SIZE = 32
 PADD_CHAR = '?'
 
+# Ecryption funcs: #
 def encrypt(plaintext):
     from crypto_extended import generate_key as KEY
     padded_plaintext = padd(plaintext)
@@ -18,7 +28,7 @@ def decrypt(encoded_ciphertext):
     padded_plaintext = decryptor.decrypt(ciphertext)
     return depadd(padded_plaintext)
 
-#Utill:
+## Utill for encryption funcs: ##
 def padd(not_padded):
     padding_amount = (BLOCK_SIZE - len(not_padded) % BLOCK_SIZE)
     padding = padding_amount * PADD_CHAR
