@@ -93,7 +93,7 @@ def run():
     sync(server, username, password, True)
     while True:
         time.sleep(TIME_BETWEEN_SYNCS)
-        # raw_input()
+        # raw_input('-----------------Enter to sync-----------------')
         sync(server, username, password)
 
 '''
