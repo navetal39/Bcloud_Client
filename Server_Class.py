@@ -118,10 +118,10 @@ class Server(object):
         print 'cmp: more dict'
         for extention in IGNORE:
             for key in updates_dict.keys():
-                if updates_dict[key].endswith(extention):
+                if key.endswith(extention):
                     del updates_dict[key]
             for key in server_updates_dict.keys():
-                if server_updates_dict[key].endswith(extention):
+                if key.endswith(extention):
                     del server_updates_dict[key]
         print updates_dict, 'and', server_updates_dict
         compared = set()
