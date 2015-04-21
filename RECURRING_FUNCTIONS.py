@@ -1,16 +1,12 @@
 # INFO: #
 # ===================================
 
-'''
-TO DO:
-1) secured functions
-'''
 
 import crypto
 
 # File Transfering: #
 def file_recv(sock, count = 0):
-    ''' This method is for reciving large files.
+    ''' This method is for receiving large files. It works according to BCF Protocol, which is documented on its own file in Hebrew.
     '''
     response = sock.recv(2048)
     print 'recived '+response # -For The Record-
@@ -19,41 +15,41 @@ def file_recv(sock, count = 0):
         if flag != 'SIZ':
             raise
         size = int(str_size)
-    except:
-        if count < 3: #Just making sure that it won't attemt endlessly
+    except: # Something went wrong, try again:
+        if count < 3: # Just making sure that it won't attempt endlessly
             print 'try again' # -For The Record-
-            sock.send('NAK|'+response)
+            sock.send('NAK|'+response) # Tell the other side I didn't received the size.
             final_response = file_recv(sock, count+1)
-        else:
+        else: # Something went wrong and we already tried again - really WTF:
             final_response = 'WTF'
-    else:
-        sock.send('ACK|'+response)
+    else: # The size was correctly received, now its time for the file:
+        sock.send('ACK|'+response) # Tell the other side I got the size.
         print 'go for it' # -For The Record-
-        final_response = sock.recv(size)
+        final_response = sock.recv(size) # Now the file!
         print 'recived file' # -For The Record-
     finally:
         return final_response
 
 def file_send(sock, mess):
-    ''' This method is for sending large files.
+    ''' This method is for sending large files. It works according to BCF Protocol, which is documented on its own file in Hebrew.
     '''
     size = len(mess)
     size_message = 'SIZ|{}'.format(size)
     print 'sending '+size_message # -For The Record-
-    sock.send('SIZ|{}'.format(size))
-    response = sock.recv(len(size_message) + 5)
+    sock.send('SIZ|{}'.format(size)) # Send the size.
+    response = sock.recv(len(size_message) + 5) # receive the status message.
     print 'recived '+response # -For The Record-
     response_parts = response.split('|')
     flag = response_parts[0]; response_parts.remove(flag)
     if response_parts == size_message.split('|'):
-        if flag == 'NAK':
+        if flag == 'NAK': # Something went wrong, try again:
             print 'trying again' # -For The Record-
             file_send(sock, mess)
             return
-        elif flag == 'ACK':
+        elif flag == 'ACK': # LG! send the file:
             sock.send(mess)
             print 'sent mess' # -For The Record-
-        else: #Just so there'll be an else...
+        else: # Just so there'll be an else...
             pass
     else:
         print response_parts
@@ -66,7 +62,7 @@ def file_send(sock, mess):
 def secure_recv(sock, size = 2048):
     ''' This method receives the encrypted message (the ciphertext), decrypts it and returns the plaintext (NOT SSL/TLS).
     '''
-    encMess = sock.recv(size)
+    encMess = sock.recv(size+1)
     mess = crypto.decrypt(encMess)
     return mess
 
@@ -80,21 +76,17 @@ def secure_send(sock, mess):
 
 ## Files: ##
 def secure_file_recv(sock, count = 0):
-    ''' This method is for reciving large files.
+    ''' This method is for receiving large files securely. It works according to BCF Protocol, which is documented on its own file in Hebrew.
     '''
     response = secure_recv(sock)
     print 'recived '+response # -For The Record-
-    try:
-        flag, str_size = response.split('|')
-    except ValueError:
-        print "------------>Server probably crashed<------------"
-        flag = 'WTF'
+    flag, str_size = response.split('|')
     try:
         if flag != 'SIZ':
             raise
         size = int(str_size)
     except:
-        if count < 3: #Just making sure that it won't attemt endlessly
+        if count < 3: #Just making sure that it won't attempt endlessly
             print 'try again' # -For The Record-
             seure_send(sock, 'NAK|'+response)
             final_response = secure_file_recv(sock, count+1)
@@ -109,7 +101,7 @@ def secure_file_recv(sock, count = 0):
         return final_response
 
 def secure_file_send(sock, mess):
-    ''' This method is for sending large files.
+    ''' This method is for sending large files securely. It works according to BCF Protocol, which is documented on its own file in Hebrew.
     '''
     size = len(crypto.encrypt(mess))    
     size_message = 'SIZ|{}'.format(size)    
