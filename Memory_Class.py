@@ -11,8 +11,12 @@ class Memory(object):
         self.path = path
 
     def ensure_existance(self, folder_type):
-        if not os.path.exists(self.path + '/' + folder_type):
-            os.makedirs(self.path + '/' + folder_type)
+        ''' Ensures the existance of the main folders, in case a user tries to delete them.
+        '''
+        folders = [self.path + '/' + folder_type, self.path + '/' + folder_type + '/public', self.path + '/' + folder_type + '/private'] # Paths to the folder and it's 2 sub-folders.
+        for folder in folders:
+            if not os.path.exists(folder):
+                os.makedirs(folder)
     
     def get_last_updates(self, folder_type):
         self.ensure_existance(folder_type)
