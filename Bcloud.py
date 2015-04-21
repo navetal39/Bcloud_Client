@@ -68,10 +68,10 @@ def run():
 
     global FOLDERS_LOCATION
     global TIME_BETWEEN_SYNCS
-    prepare_folders(FOLDERS_LOCATION)
-    ACTUAL_FOLDERS_LOCATION = FOLDERS_LOCATION + '/Bcloud'
+    prepare_folders(FOLDERS_LOCATION) # Creates the main and 2 sub-folders
+    ACTUAL_FOLDERS_LOCATION = FOLDERS_LOCATION + '/Bcloud' # For easier access to the 2 sub-folders
 
-    
+    # Inputs:
     while True:
         username = raw_input('Username: ')
         if check(username):
@@ -86,15 +86,15 @@ def run():
         else:
             print 'ERROR! {} is not a valid password!'.format(password)
 
-    memory = Memory(ACTUAL_FOLDERS_LOCATION)
+    memory = Memory(ACTUAL_FOLDERS_LOCATION) # Creates the object that'll help accessing the memory
     print 'memory set up'
-    server = Server(SYNC_IP, SYNC_PORT, memory)
+    server = Server(SYNC_IP, SYNC_PORT, memory) # Create the object that'll be responsible for the synchronization
     print 'Initial synchronization...'
-    sync(server, username, password, True)
+    sync(server, username, password, True) # Initial synchronization
     while True:
         time.sleep(TIME_BETWEEN_SYNCS)
-        # raw_input('-----------------Enter to sync-----------------')
-        sync(server, username, password)
+        # raw_input('-----------------Enter to sync-----------------') # Used for testing
+        sync(server, username, password) # Timed synchronization
 
 '''
 Exciting. Satisfying. Period.

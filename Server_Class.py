@@ -22,13 +22,15 @@ class Server(object):
         self.sock = socket.socket()
         self.memory = memory
     
-    def __str__(self):
+    def __str__(self): # Used for debug
         return "ip: {ip}; port: {port}".format(ip=self.server_ip, port=self.server_port)
     
-    def __repr__(self):
+    def __repr__(self): # Used for debug
         return "################\nThe main server is (or at least should be) listening on:\nIP address: {ip}\nTCP port: {port}\n################".format(ip=self.server_ip, port=self.server_port)
 
     def connect(self, username, password):
+        ''' Connects to the server and authenticates
+        '''
         try:
             self.sock = socket.socket()
             print 'cnt: defined'
@@ -53,10 +55,14 @@ class Server(object):
             return 'WTF'
         
     def disconnect(self):
+        ''' Disconnects from the server
+        '''
         self.sock.close()
         print 'dsc: closed'
 
     def get_last_updates(self, folder_type):
+        ''' Gets the last updates from the server
+        '''
         message = "LUD|"+folder_type
         print 'glu: made message'
         secure_send(self.sock, message)
@@ -77,6 +83,9 @@ class Server(object):
         return updates_dict
 
     def update_updates_info(self, folder_type):
+        ''' Updates the update's info on the server side so it'll include the latest last change times
+        '''
+        # Preperations
         updates_dict = self.memory.get_last_updates(folder_type)
         print 'uui: got dict'
         new_data = ""
@@ -96,6 +105,7 @@ class Server(object):
         flag = response_parts[0]; response_parts.remove(flag)
         print 'uui: got flag'
         if flag == 'ACK' and response_parts == message.split('|'):
+            # File transfer
             secure_file_send(self.sock, new_data)
             print 'uui: sent file'
             final_response = secure_recv(self.sock)
@@ -112,11 +122,16 @@ class Server(object):
             raise # Shouldn't get here...
 
     def compare_updates(self, folder_type, first_time):
+        ''' The method gets a folder type and a flag indicating weather this is the first sync
+            Or not. It then sends requests to the memory module and the server for latest updates
+            of files, and compares them. Finally it decides which files should be updated on which side
+            and returns that information
+        '''
         updates_dict = self.memory.get_last_updates(folder_type)
         print 'cmp: got dict'
         server_updates_dict = self.get_last_updates(folder_type)
         print 'cmp: more dict'
-        for extention in IGNORE:
+        for extention in IGNORE: # A system that makes the system ignore files with specific extentions (like system files)
             for key in updates_dict.keys():
                 if key.endswith(extention):
                     del updates_dict[key]
@@ -163,6 +178,9 @@ class Server(object):
         return to_send, to_recv, to_delete
 
     def stringify(self, l):
+        ''' The method recives a list of paths in string format, and converts them into one string
+            to be transfered during the BCSP sync phase.
+        '''
         l_str = ''
         for item in l:
             l_str+='<>{}'.format(item)
@@ -171,24 +189,28 @@ class Server(object):
         return l_str
         
     def sync(self, folder_type, first_time = False):
+        ''' This method deals with the entire sync phase. It recives a folder type and a flag indicating
+            weather it's the first sync or not and acts accordingly to make sure both sides
+            have the latest version of each file in the synchronizing folder.
+        '''
         to_send, to_recv, to_delete = self.compare_updates(folder_type, first_time)
         print 'compared'
         total_changes = len(to_send)+len(to_recv)+len(to_delete)
         print total_changes, 'changes'
-        first_total_changes = len(to_send)+len(to_recv)
+        first_total_changes = len(to_send)+len(to_recv) # If it's a first sync there's no need to tell the server to delete anything.
         if ((first_total_changes and first_time) or (total_changes and not first_time)): # If there's something that needs to update on the server's side (2 scenarios - first sync or timed sync)
             print 'doing stuff'
             to_send_str = self.stringify(to_send)
             to_recv_str = self.stringify(to_recv)
             to_delete_str = self.stringify(to_delete)
             print 'stringified'
-            long_ass_message = "{}|{}|".format(folder_type, to_recv_str)
+            long_ass_message = "{}|{}|".format(folder_type, to_recv_str) # Initial message
             print 'long ass'
-            if len(to_send):
-                long_ass_message += 'UPDATE'
+            if len(to_send): # If there's anything that needs to be sent to the server...
+                long_ass_message += 'UPDATE' # Adds the correct string.
                 print 'longer ass'
-            long_ass_message += '|'
-            if not first_time:
+            long_ass_message += '|' #  If there's no there'll be nothing between the 2 '|'s, and the server will recive an empty string when it'll seperate the message into it's parts.
+            if not first_time: # If it's not the first time the list of files that needs to be deleted should be added to the end as well.
                 long_ass_message += to_delete_str
                 print 'longest ass'
 
