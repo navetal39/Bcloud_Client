@@ -43,7 +43,7 @@ class Memory(object):
         
         try:
             os.remove(self.path+'/files_to_server.zip') # Removal - Just in case the temporary file wasen't removed properly.
-         except WindowsError, error:
+        except WindowsError, error:
             if error.errno == 2: # The file does not exist - All is good
                 pass
             else:
