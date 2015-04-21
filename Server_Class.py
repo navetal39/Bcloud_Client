@@ -176,7 +176,7 @@ class Server(object):
         total_changes = len(to_send)+len(to_recv)+len(to_delete)
         print total_changes, 'changes'
         first_total_changes = len(to_send)+len(to_recv)
-        if ((total_changes and not first_time) or (first_total_changes and first_time)): # If there's something that needs to update on the server's stide
+        if ((first_total_changes and first_time) or (total_changes and not first_time)): # If there's something that needs to update on the server's side (2 scenarios - first sync or timed sync)
             print 'doing stuff'
             to_send_str = self.stringify(to_send)
             to_recv_str = self.stringify(to_recv)
