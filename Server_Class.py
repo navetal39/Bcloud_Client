@@ -260,8 +260,9 @@ class Server(object):
             self.memory.delete_files(folder_type, to_delete)
             print 'files deleted'
 
-        self.update_updates_info(folder_type)
-        print 'updated him'
+        if len(total_changes):
+            self.update_updates_info(folder_type)
+            print 'updated him'
 
                             
             
