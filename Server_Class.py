@@ -47,8 +47,11 @@ class Server(object):
             flag = response_parts[0]; response_parts.remove(flag)
             print 'cnt: got flag'
             if response_parts == message.split('|'):
+                if flag != 'SCS':
+                    self.disconnect()
                 return flag
             else:
+                self.disconnect()
                 raise
         except Exception, error:
             print 'ERROR', error
