@@ -68,6 +68,8 @@ def run():
 
     global FOLDERS_LOCATION
     global TIME_BETWEEN_SYNCS
+    if TIME_BETWEEN_SYNCS < 10:
+        TIME_BETWEEN_SYNCS = 10
     prepare_folders(FOLDERS_LOCATION) # Creates the main and 2 sub-folders
     ACTUAL_FOLDERS_LOCATION = FOLDERS_LOCATION + '/Bcloud' # For easier access to the 2 sub-folders
 
