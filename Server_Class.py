@@ -86,9 +86,9 @@ class Server(object):
         return updates_dict
 
     def update_updates_info(self, folder_type):
-        ''' Updates the update's info on the server side so it'll include the latest last-change times.
+        ''' Updates the update's info on the server side so it'll include the latest last change times
         '''
-        # Preparations
+        # Preperations
         updates_dict = self.memory.get_last_updates(folder_type)
         print 'uui: got dict'
         new_data = ""
@@ -192,7 +192,7 @@ class Server(object):
         return l_str
         
     def sync(self, folder_type, first_time = False):
-        ''' This method deals with the entire sync phase. It receives a folder type and a flag indicating
+        ''' This method deals with the entire sync phase. It recives a folder type and a flag indicating
             weather it's the first sync or not and acts accordingly to make sure both sides
             have the latest version of each file in the synchronizing folder.
         '''
@@ -263,7 +263,7 @@ class Server(object):
             self.memory.delete_files(folder_type, to_delete)
             print 'files deleted'
 
-        if len(total_changes):
+        if total_changes:
             self.update_updates_info(folder_type)
             print 'updated him'
 
